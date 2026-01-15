@@ -1,0 +1,21 @@
+\begin{thebibliography}{}
+
+\bibitem[air, 2025]{airflow}
+ (2025).
+\newblock Apache airflow.
+\newblock \url{https://airflow.apache.org/}.
+\newblock Accessed: 2025-01-15.
+
+\bibitem[spa, 2025]{spark}
+ (2025).
+\newblock Apache spark.
+\newblock \url{https://spark.apache.org/}.
+\newblock Accessed: 2025-01-15.
+
+\bibitem[map, 2025]{mapbox}
+ (2025).
+\newblock Mapbox.
+\newblock \url{https://www.mapbox.com/}.
+\newblock Accessed: 2025-01-15.
+
+\end{thebibliography}

@@ -1,0 +1,108 @@
+\chapter{Appendix A: Reproducibility and Repository Guide}
+\section{Repository tree}
+Listing~\ref{lst:repo-tree} shows the top level layout used for reproducibility and traceability. The tree focuses on the pipeline scripts, outputs, and the dashboard assets.
+
+\begin{lstlisting}[language=bash,caption={Repository tree (abridged).},label={lst:repo-tree}]
+traffic_project/
+  airflow/
+    dags/
+      traffic_pipeline_dag.py
+      scripts/
+        ownload_dft_london_counts.py
+        fetch_tfl_disruptions.py
+        01b_clean_csv_to_parquet_spark.py
+        02_build_gold_features_spark.py
+        03_train_models_walkforward.py
+        04_build_routing_graph.py
+        06_build_weighted_routing_graph.py
+        07_route_demo.py
+        07b_print_routes.py
+        07c_route_hotspot_breakdown.py
+        05_make_dashboard_data.py
+    mapbox_dashboard/
+      index.html
+      app.js
+      config.js
+      data/
+      tools/
+  report/
+    main.tex
+    chapters/
+  requirements.txt
+  environment.yml
+\end{lstlisting}
+
+\section{Environment specification}
+Two environment options are provided. For pip, use \texttt{requirements.txt}. For conda, use \texttt{environment.yml}. Both include Airflow, Spark, pandas, and supporting libraries used across the pipeline.
+
+\begin{lstlisting}[language=bash,caption={Environment setup.},label={lst:env-setup}]
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+
+# or conda
+conda env create -f environment.yml
+conda activate traffic_project
+\end{lstlisting}
+
+\section{How to run}
+The pipeline can be run step by step or via Airflow. The commands below show a direct sequence that reproduces the main artefacts used by the dissertation.
+
+\begin{lstlisting}[language=bash,caption={Reproducible execution steps.},label={lst:run-steps}]
+# 1) Fetch data
+python airflow/dags/scripts/ownload_dft_london_counts.py
+$env:TFL_APP_KEY="<your key>"
+python airflow/dags/scripts/fetch_tfl_disruptions.py
+
+# 2) Build features (Spark)
+python airflow/dags/scripts/01b_clean_csv_to_parquet_spark.py \
+  --in_csv data/dft_london_traffic_counts.csv \
+  --out_parquet data_lake/silver/cleaned_parquet/region=London
+
+python airflow/dags/scripts/02_build_gold_features_spark.py \
+  --in_parquet data_lake/silver/cleaned_parquet/region=London \
+  --out_gold data_lake/gold/features_hourly \
+  --region London
+
+# 3) Train models
+python airflow/dags/scripts/03_train_models_walkforward.py \
+  --in_gold data_lake/gold/features_hourly/region=London \
+  --out_models data_lake/gold/models_walkforward \
+  --region London
+
+# 4) Export dashboard files
+python airflow/dags/scripts/05_make_dashboard_data.py \
+  --in_models data_lake/gold/models_walkforward/region=London \
+  --out_dashboard airflow/mapbox_dashboard/data
+
+# 5) Run dashboard locally
+cd airflow/mapbox_dashboard
+python -m http.server 8000
+\end{lstlisting}
+
+\section{Seeds and reproducibility notes}
+Deterministic splits are enforced by using time ordered folds in walk forward validation. No future information is used in feature generation. Random components are controlled where used, for example sampling uses a fixed seed (42). Model training uses fixed hyperparameters across folds to ensure comparable evaluation. These choices reduce variance across runs and allow results to be replicated.
+
+\section{Data provenance log}
+Table~\ref{tab:provenance} records the main artefacts created at each stage to support auditability.
+
+\begin{table}[H]
+\centering
+\caption{Data provenance log.}
+\begin{tabular}{p{0.18\linewidth} p{0.24\linewidth} p{0.50\linewidth}}
+\toprule
+Stage & Inputs & Outputs \\
+\midrule
+Raw ingestion & TfL API, DfT ZIP & \texttt{data/tfl\_disruptions\_london.csv}, \texttt{data/dft\_london\_traffic\_counts.csv} \\
+Cleaning & Raw CSVs & \texttt{data\_lake/silver/cleaned\_parquet/region=London} \\
+Features & Silver parquet & \texttt{data\_lake/gold/features\_hourly/region=London} \\
+Modeling & Features & \texttt{data\_lake/gold/models\_walkforward/region=London}, \texttt{walkforward\_metrics.csv} \\
+Routing & Features + graph & \texttt{data\_lake/gold/routes\_output/region=London} \\
+Dashboard export & Gold outputs & \texttt{airflow/mapbox\_dashboard/data/*.geojson}, \texttt{walkforward\_metrics.csv} \\
+\bottomrule
+\end{tabular}
+\label{tab:provenance}
+\end{table}
+
+\section{Appendix scope}
+This appendix documents the minimum set of steps and artefacts required to reproduce results and regenerate the dashboard. The repository tree and provenance log are designed to make verification and re execution straightforward for external reviewers.

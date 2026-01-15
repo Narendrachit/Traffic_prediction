@@ -1,0 +1,30 @@
+\chapter{Discussion and Conclusion}
+\section{Discussion: operational value}
+The model enables proactive monitoring of congestion risk at the road segment level. Hotspot forecasts can support pre positioning of traffic management resources, targeted inspection of corridors with persistent congestion, and commuter advisory messaging that highlights higher risk routes. The routing comparison provides a concrete mechanism to translate predicted risk into alternative paths, which is valuable for operational planning and scenario testing.
+
+The system also enables periodic reporting without manual reprocessing. By scheduling batch runs, updates to hotspot rates and route metrics can be delivered on a regular cadence. This supports a decision cycle that aligns with planning meetings and policy reviews rather than requiring continuous real time infrastructure.
+
+\section{Limitations}
+Several limitations remain. Data outages and missing coordinates reduce coverage in some boroughs, which may bias results toward well observed corridors. Incident reporting varies in completeness and timeliness, and the severity scale may not capture duration or lane impacts. The model generalises within the observed period but may be less reliable under major network changes or atypical events. These constraints limit the degree to which results should be used for fine grained operational control.
+
+A further limitation is the reliance on volume as a proxy for congestion. While volume correlates with delay, it does not capture speed directly. The hotspot labels therefore represent elevated demand rather than measured delay, which should be considered when interpreting route suggestions.
+
+\section{Cost and latency considerations}
+If deployed operationally, compute cost and latency would be driven by data ingestion and feature generation rather than model inference. Batch processing with Spark is suitable for daily or weekly updates and can run on modest infrastructure, but real time forecasting would require streaming ingestion and lower latency storage. Storage costs remain manageable because parquet compression reduces footprint, while GeoJSON exports are small.
+
+Latency is also affected by incident data availability. Delayed incident updates reduce the benefit of near real time prediction. For this reason, the current design favors scheduled updates and emphasizes robustness rather than ultra low latency.
+
+\section{Ethical considerations}
+The project uses public, anonymised data with no human participants. Ethical considerations focus on transparency and potential misuse. Congestion predictions can influence policy decisions and may disproportionately affect specific communities if used without context. The system therefore prioritizes explainable features, clear documentation of assumptions, and visible uncertainty through error analysis.
+
+Transparency is also supported by open data licensing and reproducible pipelines. This reduces the risk of opaque decision making and provides a foundation for scrutiny when results inform interventions or public communications.
+
+\section{Research questions answered and contributions}
+RQ1 is answered by demonstrating that TfL incident data combined with DfT volumes can forecast hotspot risk with stable performance under walk forward validation. RQ2 is answered by identifying consistent peak patterns, weekday effects, seasonal variability, and spatial clustering in inner corridors. RQ3 is answered by comparing baselines and advanced models, showing that tree based approaches are most reliable for this dataset and that errors concentrate in disruption heavy areas. RQ4 is answered by implementing a dashboard that communicates hotspot risk and route alternatives in a form suitable for decision support.
+
+The contributions are a reproducible pipeline from ingestion to spatial outputs, a walk forward evaluation framework, hotspot forecasting and routing analytics, and a dashboard that operationalizes the outputs for stakeholders.
+
+\section{Future work}
+Future work should focus on targeted improvements rather than broad redesign. Priority enhancements include adding weather and event features, refining incident severity with duration measures, and integrating borough level controls for fairness analysis. A second priority is limited user testing with planners to validate dashboard usability and refine interaction design. A third priority is experimenting with lightweight probabilistic models to communicate uncertainty without sacrificing interpretability.
+
+These steps are realistic within the existing architecture and provide a clear path to higher reliability and stronger decision support impact.

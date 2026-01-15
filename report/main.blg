@@ -1,0 +1,72 @@
+This is BibTeX, Version 0.99e
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+Reallocating 'name_of_file' (item size: 1) to 29 items.
+A level-1 auxiliary file: chapters/01_introduction.aux
+Reallocating 'name_of_file' (item size: 1) to 34 items.
+A level-1 auxiliary file: chapters/02_literature_review.aux
+Reallocating 'name_of_file' (item size: 1) to 33 items.
+A level-1 auxiliary file: chapters/03_data_and_problem.aux
+Reallocating 'name_of_file' (item size: 1) to 28 items.
+A level-1 auxiliary file: chapters/04_methodology.aux
+Reallocating 'name_of_file' (item size: 1) to 30 items.
+A level-1 auxiliary file: chapters/05_system_design.aux
+Reallocating 'name_of_file' (item size: 1) to 35 items.
+A level-1 auxiliary file: chapters/06_results_evaluation.aux
+Reallocating 'name_of_file' (item size: 1) to 27 items.
+A level-1 auxiliary file: chapters/07_conclusion.aux
+Reallocating 'name_of_file' (item size: 1) to 8 items.
+The style file: apalike.bst
+Reallocating 'name_of_file' (item size: 1) to 11 items.
+Reallocating 'name_of_file' (item size: 1) to 24 items.
+A level-1 auxiliary file: chapters/appendix_a.aux
+Database file #1: references.bib
+Warning--I didn't find a database entry for "vlahogianni2014"
+Warning--I didn't find a database entry for "ma2015"
+Warning--I didn't find a database entry for "li2018"
+Warning--I didn't find a database entry for "dft_counts"
+Warning--to sort, need author or key in mapbox
+Warning--to sort, need author or key in spark
+Warning--to sort, need author or key in airflow
+You've used 3 entries,
+            1935 wiz_defined-function locations,
+            494 strings with 4106 characters,
+and the built_in function-call counts, 644 in all, are:
+= -- 69
+> -- 0
+< -- 0
++ -- 0
+- -- 0
+* -- 45
+:= -- 109
+add.period$ -- 12
+call.type$ -- 3
+change.case$ -- 15
+chr.to.int$ -- 3
+cite$ -- 9
+duplicate$ -- 30
+empty$ -- 55
+format.name$ -- 0
+if$ -- 124
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 0
+newline$ -- 21
+num.names$ -- 0
+pop$ -- 9
+preamble$ -- 1
+purify$ -- 15
+quote$ -- 0
+skip$ -- 22
+stack$ -- 0
+substring$ -- 39
+swap$ -- 0
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 18
+warning$ -- 3
+while$ -- 0
+width$ -- 0
+write$ -- 41
+(There were 7 warnings)

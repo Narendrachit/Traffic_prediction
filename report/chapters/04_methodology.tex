@@ -1,0 +1,87 @@
+\chapter{Methodology}
+\section{Analytical approach}
+The methodology follows a structured analytics lifecycle: data ingestion, cleaning, feature engineering, model training, evaluation, and post processing for spatial outputs. This structure ensures that each stage is testable and repeatable. The project uses Spark for scalable data processing \cite{spark}, with Python for orchestration and data preparation. The choice of tools reflects a balance between industry relevance and practical development effort. The analytical approach is designed to support a reproducible pipeline that can be re run with new data or extended to new regions. Spark is selected because it handles large CSV ingestion efficiently while remaining viable on a single machine in local mode.
+
+A key methodological principle is modularity. Each stage is implemented as a separate script with well defined inputs and outputs. This reduces coupling and enables experimentation without altering the entire pipeline. The approach mirrors data engineering practices in industry, where pipelines are decomposed into manageable tasks. By following this structure, the project emphasizes reliability and clarity alongside analytical performance.
+
+The methodology also emphasizes traceability. Each stage records outputs in the data lake with clear naming conventions and metadata. This allows downstream steps to reference the correct inputs and supports auditability. The use of containerized scripts further improves reproducibility by locking runtime dependencies. These practices align with professional standards for data intensive systems. Containerized execution is used to reduce environment drift and to make runs consistent across machines.
+
+\section{Data cleaning and transformation}
+Data cleaning is performed in Spark to handle large CSV inputs efficiently. The pipeline normalizes null tokens, casts numeric columns, and enforces a set of required fields. Records missing essential fields are removed. Dates are parsed into a consistent timestamp format. The cleaned output is stored in partitioned parquet files, enabling efficient filtering and downstream processing. The separation between raw and cleaned data reduces the risk of accidental overwrites and supports auditing of changes. Parquet is chosen for the cleaned layer because columnar storage speeds repeated scans and reduces IO costs.
+
+The transformation logic includes handling of mixed date formats, which is common in open datasets. The pipeline generates a combined timestamp from date and hour fields, then converts it to a consistent time zone. Numeric columns are cast with error handling so that invalid values are converted to null rather than breaking the pipeline. This ensures stability and allows the removal of invalid rows in a controlled manner. The resulting dataset is a clean, consistent foundation for feature engineering.
+
+Data cleaning also includes removing records with implausible values, such as negative volumes or missing junction identifiers. These checks reduce noise and improve downstream model stability. The cleaning stage therefore functions as both a quality filter and a normalization step, ensuring that subsequent analytics operate on a reliable dataset.
+
+\section{Feature engineering}
+Feature engineering transforms raw fields into model ready variables. Temporal features are derived from timestamps and include hour of day, day of week, and month. The disruption severity feature is aggregated to hourly averages. The feature vector includes spatial coordinates to capture location specific effects. The project uses a Spark pipeline to assemble features and apply standard scaling. This ensures consistent preprocessing across training and inference. The design keeps features interpretable, allowing analysis of model behavior and easier explanation to stakeholders. Standard scaling is applied to keep feature magnitudes comparable and improve model stability.
+
+The feature pipeline is implemented in Spark ML using VectorAssembler and StandardScaler. This approach ensures that preprocessing is applied consistently and is stored alongside the model for reproducibility. The features are deliberately minimal to support interpretability and reduce the risk of overfitting. Additional features could be introduced in future work, but the current set provides a solid baseline and supports the project objectives.
+
+Feature engineering also includes exploratory validation through summary statistics and distributions. These checks verify that engineered features behave as expected and highlight potential anomalies such as skewed distributions. This step ensures that the model receives meaningful inputs and supports transparent reporting in the dissertation.
+
+\section{Model training and selection}
+The primary model is a gradient boosted tree regressor implemented in Spark ML. The model is trained with a limited depth and number of iterations to balance accuracy and training time. Additional models such as random forests can be enabled, but the primary focus is on the boosted model due to its strong performance on structured data. Training is performed on a temporally ordered dataset with configurable window sizes. The pipeline allows re training with different parameters to support sensitivity analysis. Model artifacts and metrics are stored in the gold layer for traceability. Gradient boosting is chosen because it delivers strong accuracy on tabular features without requiring heavy feature engineering.
+
+Model selection is informed by literature on structured regression and by practical considerations. Gradient boosting is known to handle non linear feature interactions and provide strong baseline performance. The model hyperparameters are chosen to avoid overfitting while maintaining predictive capacity. The Spark ML implementation provides scalability and integration with the feature pipeline. This reduces complexity compared to manual model management and supports repeatable experiments.
+
+Training also includes control of resource usage through driver memory and shuffle partitions. These parameters are exposed for tuning to prevent runtime instability. This reflects a methodological emphasis on operational feasibility, ensuring that the model can be trained reliably in the available environment.
+
+\section{Evaluation protocol}
+Evaluation uses walk forward validation, where the training window advances through time and predictions are made on subsequent periods. This protocol reduces information leakage and better reflects operational forecasting. The evaluation metrics are RMSE, MAE, and R2. Metrics are reported across folds and summarized to provide a robust performance estimate. The evaluation outputs are also exported to CSV for visualization in the dashboard. This provides a direct link between model performance and the end user interface. Walk forward evaluation is selected because it mimics real deployment where only past data is available at prediction time.
+
+Walk forward validation is implemented with configurable fold sizes and test horizons. This flexibility allows the evaluation to be tailored to the data volume and the desired forecasting horizon. The metrics are computed using Spark evaluators to ensure consistency. Results are stored in the gold layer for auditability and are then used by the dashboard to display performance summaries. This ensures that evaluation is not an isolated activity but is integrated into the reporting workflow.
+
+The evaluation protocol also supports comparison across model variants. By keeping splits fixed and consistent, model improvements can be attributed to changes in features or algorithm choice rather than to random variation. This strengthens the validity of conclusions drawn from performance metrics.
+
+\section{Spatial post processing}
+Post processing converts predictions into spatial insights. Edge level hotspot rates are computed by aggregating predicted congestion across road segments. A weighted routing graph is created by applying penalties to edges with higher hotspot rates. Two routing strategies are produced: shortest distance and congestion aware. Route statistics such as length and weighted cost are exported. These outputs are then converted to GeoJSON to support map visualization. The design ensures that spatial outputs are consistent with model predictions while remaining interpretable. GeoJSON is used because it is lightweight and directly supported by web mapping tools without a back end.
+
+The routing stage uses a graph representation of the road network. Edge weights are derived from predicted hotspot rates, which allows the model output to influence routing decisions. This method aligns with decision support objectives by providing concrete route comparisons. The GeoJSON conversion step ensures compatibility with web mapping tools, enabling interactive visualization without complex back end services. This stage highlights the applied value of the predictive model by connecting forecasts to actionable spatial outputs.
+
+Spatial post processing also includes validation checks, such as ensuring that route geometries contain valid coordinate pairs and that endpoints match known nodes. These checks prevent visualization errors and ensure that the dashboard can load routes reliably. This operational detail is essential for producing a usable final output.
+
+The methodological choices reflect a balance between analytical rigor and operational feasibility. Each stage is designed to be deterministic and configurable, allowing the pipeline to be re executed under different settings without manual intervention. This supports reproducibility and enables controlled experimentation with parameters such as hotspot thresholds and training windows. The integration of evaluation outputs into the dashboard also reflects a methodological commitment to transparency, ensuring that model performance is visible alongside spatial outputs. This design aligns with applied analytics practice where model accuracy must be communicated to end users.
+
+The methodology also emphasizes alignment between data resolution and modeling choices. The use of hourly aggregation ensures compatibility across datasets and avoids unnecessary interpolation. The feature set is consistent with the temporal granularity of the data, while the evaluation protocol respects the chronological order of observations. These decisions reduce the risk of leakage and improve the credibility of the results. The methodology therefore serves as a coherent blueprint for building a reliable predictive pipeline in the absence of real time data feeds.
+
+An additional methodological consideration is the separation of training and reporting artifacts. Model outputs are stored alongside evaluation metrics, while geospatial exports are generated in a separate step. This avoids mixing analytical and presentation concerns and supports reproducibility. It also ensures that changes to visualization logic do not alter core analytical results. This separation aligns with best practice in data engineering and reinforces the reliability of the pipeline.
+
+The methodology also accounts for operational monitoring by exporting intermediate summaries such as record counts and basic statistics. These summaries allow quick validation after each stage and help detect pipeline failures early. Including such checks reflects industry practice where data pipelines are monitored for drift and unexpected changes. While the dissertation focuses on modeling and spatial outputs, these operational checks are essential for ensuring that the pipeline remains trustworthy over time.
+
+Methodological robustness is further supported by consistent parameterization across runs. By centralizing parameters such as region, thresholds, and evaluation windows, the pipeline avoids hard coded assumptions. This promotes repeatability and ensures that alternative experimental configurations can be executed without code modifications, which is important for systematic evaluation.
+Figure~\ref{fig:methodology} summarizes the main methodological stages from ingestion through spatial outputs.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=0.8cm and 0.6cm]
+  \node[smallblock] (ingest) {Ingest};
+  \node[smallblock, right=of ingest] (clean) {Clean};
+  \node[smallblock, right=of clean] (features) {Features};
+  \node[smallblock, right=of features] (train) {Train};
+  \node[smallblock, right=of train] (eval) {Evaluate};
+  \node[smallblock, right=of eval] (spatial) {Spatial};
+  \draw[line] (ingest) -- (clean);
+  \draw[line] (clean) -- (features);
+  \draw[line] (features) -- (train);
+  \draw[line] (train) -- (eval);
+  \draw[line] (eval) -- (spatial);
+\end{tikzpicture}
+\caption{Methodology stages from ingestion to spatial outputs.}
+\label{fig:methodology}
+\end{figure}
+
+\begin{lstlisting}[language=Python,caption={Simplified Spark feature pipeline.}]
+assembler = VectorAssembler(
+    inputCols=["hour_of_day","day_of_week","month","avg_severity","latitude","longitude"],
+    outputCol="features_raw"
+)
+scaler = StandardScaler(
+    inputCol="features_raw",
+    outputCol="features",
+    withMean=True,
+    withStd=True
+)
+model = GBTRegressor(labelCol="target_volume", featuresCol="features")
+pipeline = Pipeline(stages=[assembler, scaler, model])
+\end{lstlisting}

@@ -1,0 +1,25 @@
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {1.1}{\ignorespaces End-to-end system overview.}}{7}{figure.caption.7}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Summary of literature themes: forecasting models, spatial context, and decision support.}}{13}{figure.caption.8}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Pipeline flow from raw inputs to dashboard outputs.}}{15}{figure.caption.10}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Data architecture and storage governance.}}{16}{figure.caption.11}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Hotspot labelling illustration for an example day.}}{17}{figure.caption.12}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Walk forward validation with expanding training windows.}}{18}{figure.caption.14}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Methodology stages from ingestion to spatial outputs.}}{23}{figure.caption.15}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces System architecture including data lake, orchestration, and dashboard.}}{30}{figure.caption.17}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Prediction versus actual volume for two representative links.}}{32}{figure.caption.19}%
+\contentsline {figure}{\numberline {6.2}{\ignorespaces Hour of day by day of week congestion intensity heatmap.}}{32}{figure.caption.20}%
+\contentsline {figure}{\numberline {6.3}{\ignorespaces Map of recurring hotspot locations (schematic).}}{32}{figure.caption.21}%
+\contentsline {figure}{\numberline {6.4}{\ignorespaces Seasonal trend in monthly mean volume.}}{33}{figure.caption.22}%
+\contentsline {figure}{\numberline {6.5}{\ignorespaces Error by peak versus off peak periods.}}{33}{figure.caption.23}%
+\contentsline {figure}{\numberline {6.6}{\ignorespaces Error by geography groups.}}{33}{figure.caption.24}%
+\contentsline {figure}{\numberline {6.7}{\ignorespaces Residual map highlighting systematic error regions (schematic).}}{34}{figure.caption.25}%
+\contentsline {figure}{\numberline {6.8}{\ignorespaces Case study day with incident hour marker.}}{34}{figure.caption.26}%
+\contentsline {figure}{\numberline {6.9}{\ignorespaces Dashboard pages used for decision support.}}{34}{figure.caption.27}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }

@@ -1,0 +1,120 @@
+\chapter{System Design and Implementation}
+\section{Architecture overview}
+The system is designed as a modular pipeline with clear separation between data layers, processing stages, and presentation. The architecture centers on a local data lake that stores raw, cleaned, and curated outputs. Airflow orchestrates the pipeline and executes containerized scripts. Spark handles heavy data processing tasks such as parsing large CSV files and training models. The Mapbox dashboard consumes exported artifacts without requiring direct access to compute infrastructure. This separation of concerns improves maintainability and allows each component to be replaced or upgraded independently. Decoupling the dashboard from compute is chosen to keep hosting simple and to avoid operational dependencies.
+
+The architectural pattern follows common big data practices. The processing pipeline is designed to be idempotent, allowing re runs without manual intervention. Each stage writes outputs to well defined locations to support downstream tasks. The system design also accounts for resource constraints by running Spark in local mode while preserving compatibility with cluster deployment. This ensures that the system can scale beyond the project environment if required.
+
+The architecture also emphasizes portability. Containerized tasks ensure consistent runtime environments, while configuration parameters allow the same pipeline to run with different regions or thresholds. This supports reuse and extension, which are critical for applied analytics systems.
+
+\section{Data lake design}
+The data lake follows a bronze, silver, and gold pattern. Bronze stores raw extracts from DfT and TfL. Silver stores cleaned and normalized parquet data, partitioned by year and month. Gold stores engineered features, trained model artifacts, dashboard metrics, and routing exports. This structure allows incremental computation and simplifies troubleshooting. It also reflects established data engineering practices in large scale analytics environments. Partitioning improves query performance and reduces unnecessary compute when re running specific time windows. Partitioning is selected because time bounded re runs are common in walk forward evaluation.
+
+The data lake design emphasizes traceability. Raw data is preserved in bronze to maintain a full audit trail. Silver data reflects standardized schema and consistent typing, which supports stable processing. Gold data represents curated outputs designed for consumption by models and dashboards. This layered approach reduces the risk of contamination and allows changes to be isolated. For example, a modification to feature engineering can be applied without re downloading raw data, preserving efficiency and reproducibility.
+
+The data lake also supports versioning through timestamped runs for routing outputs. This allows historical comparison of route outcomes and ensures that the latest outputs are clearly identified. Such versioning is important for reproducibility and for documenting changes over time.
+
+\section{Orchestration with Airflow}
+Airflow provides reliable task scheduling and dependency management \cite{airflow}. Each pipeline stage is implemented as a Python script executed within a container. The DAG defines the ordering of tasks from cleaning to route generation. Configuration parameters such as region, hotspot thresholds, and routing limits are exposed through runtime variables. This design enables repeatable runs and experimentation without changing code. The DAG also includes a final export step that copies the latest routing outputs into stable paths, ensuring the dashboard can access consistent files. Airflow is chosen because it provides transparent task dependencies and logging, which are required for auditability.
+
+The orchestration design reflects an operational workflow. Task groups are used to structure related stages, improving readability and maintenance. Retry policies and execution parameters are set to balance reliability with runtime. The pipeline can be triggered manually with custom parameters, enabling experimental runs. This level of control is essential for iterative development and evaluation, and it aligns with the expectations of production oriented data pipelines.
+
+Airflow also provides a clear audit trail through task logs and execution metadata. This supports debugging and enables evaluation of pipeline stability. The visibility into task outcomes is an important operational feature for any data pipeline that may be run repeatedly.
+
+\section{Spark processing and scalability}
+Spark is used for data parsing, feature engineering, and model training \cite{spark}. It provides distributed execution for large datasets and integrates with parquet storage for efficient IO. The pipeline sets memory and shuffle parameters to balance local performance and stability. The scripts are written to run on a single machine in local mode while preserving the ability to scale to a cluster. The use of Spark ML pipelines ensures consistent preprocessing and reduces the risk of mismatched transformations between training and inference. Spark is selected because it supports scale without forcing a separate cluster for this project.
+
+Scalability is achieved through partitioning and parallelism. Even in local mode, Spark can parallelize tasks across available cores. The pipeline uses configuration parameters for memory and shuffle partitions, allowing tuning for different environments. This design ensures that the system can handle larger datasets with minimal modification. The use of Spark ML pipelines also supports persistence of models and preprocessing stages, which is critical for reproducibility and downstream deployment.
+
+Spark also provides fault tolerance and optimized execution plans, which reduce the risk of failures when processing large files. These properties align with the project's objective of demonstrating scalable analytics patterns within a local environment.
+
+\section{Routing and geospatial outputs}
+Routing analysis is performed on a weighted graph derived from road segments. Edge weights incorporate congestion penalties computed from predicted hotspot rates. The routing step generates both shortest distance and congestion aware paths, and exports detailed edge sequences. GeoJSON conversion scripts transform these outputs into map ready layers. The output structure is designed to support multiple route options, filtering by route type, and calculation of key metrics such as total distance and congestion weighted cost. The two route variants are produced to make trade offs explicit rather than assuming a single optimal path.
+
+The routing output is designed to be interpretable. Each route is represented as a line feature with properties for length and hotspot exposure. The weighted graph provides a direct mechanism to represent congestion risk. By exporting both route variants, the system supports direct comparison of trade offs. This demonstrates how predictive analytics can inform decision making by quantifying the impact of congestion on route choice.
+
+Geospatial outputs are structured to support efficient loading in a browser. By exporting simplified GeoJSON and summary CSV files, the dashboard can load quickly without complex back end services. This design ensures that visualization remains responsive even when datasets are moderately large.
+
+\section{Dashboard integration and deployment}
+The system provides dual visualization platforms to serve different user needs and deployment contexts. The Mapbox dashboard is a static web application that loads GeoJSON and CSV files \cite{mapbox}. The front end provides filters for route type, destination node, and hotspot thresholds. Metrics are displayed in a simple table, and a legend clarifies the hotspot scale. The dashboard is decoupled from the compute environment and hosted on GitHub Pages at \url{https://narendrachit.github.io/Traffic_prediction/}. This approach avoids server management while still delivering a functional interface for analysis and communication. The use of standard web technologies simplifies deployment and supports broad accessibility. Static hosting is selected to minimize operational overhead while still enabling interactive exploration.
+
+The Mapbox dashboard is intentionally minimal to prioritize clarity. It includes a control panel with a small set of filters and a map view that displays hotspots and routes. The visualization relies on color scales that differentiate low and high hotspot rates. The system provides a transparent link between model outputs and visual outputs by using exported files directly. This ensures that updates to the pipeline can be reflected in the dashboard without additional engineering effort. The dashboard loads three key data files: \texttt{hotspots.geojson} (road segments with hotspot rates), \texttt{routes.geojson} (route comparisons with distance and congestion metrics), and \texttt{walkforward\_metrics.csv} (model performance across temporal folds).
+
+Complementing the web-based Mapbox interface, a Power BI dashboard (\texttt{Narendra.pbit}) provides desktop analytics capabilities for deeper exploration and custom reporting. Power BI connects directly to the exported CSV files and parquet outputs, enabling analysts to create custom visualizations, perform ad-hoc queries, and generate reports without requiring programming skills. This dual-dashboard approach recognizes that different stakeholders have different needs: web users benefit from quick, accessible visualization, while analysts require flexible tools for detailed investigation. The Power BI template includes pre-configured visualizations for temporal patterns, spatial distributions, model performance metrics, and route comparisons.
+
+The integration also supports reproducibility. Because the Mapbox dashboard is a static site, it can be archived and referenced alongside the data outputs used to generate it. This provides a stable artifact for evaluation and dissemination of results. The GitHub Pages deployment ensures long-term accessibility and version control through the git repository. The Power BI template can be shared alongside the data exports, allowing other researchers to replicate the analysis or adapt the visualizations for different regions or datasets.
+
+\section{Pipeline outputs and artifacts}
+The pipeline generates a comprehensive set of outputs organized within the gold layer of the data lake. These outputs serve multiple purposes: model evaluation, routing analysis, dashboard visualization, and reproducibility documentation. Table~\ref{tab:pipeline_outputs} summarizes the key output artifacts and their purposes.
+
+\begin{table}[H]
+\centering
+\caption{Pipeline output artifacts and their purposes}
+\label{tab:pipeline_outputs}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Output Path} & \textbf{Format} & \textbf{Purpose} \\ \midrule
+\texttt{silver/cleaned\_parquet/} & Parquet & Cleaned traffic counts (partitioned by year/month) \\
+\texttt{gold/features\_hourly/} & Parquet & Engineered features with temporal and lag variables \\
+\texttt{gold/models\_walkforward/} & Binary & Trained model artifacts (LR, GBT) \\
+\texttt{gold/models\_walkforward/walkforward\_metrics.csv} & CSV & Model performance across folds (RMSE, MAE, R²) \\
+\texttt{gold/dashboard\_data/edge\_hotspot\_rate.csv} & CSV & Hotspot rates per road segment \\
+\texttt{gold/dashboard\_data/hotspots\_time\_summary.csv} & CSV & Temporal congestion patterns \\
+\texttt{gold/routing\_graph/routing\_edges.csv} & CSV & Road network topology \\
+\texttt{gold/routing\_graph/routing\_nodes.csv} & CSV & Node coordinates (lat/lon) \\
+\texttt{gold/routing\_graph\_weighted/} & CSV & Congestion-weighted graph \\
+\texttt{gold/route\_analysis/routes\_edges.csv} & CSV & Route comparisons (distance vs congestion-aware) \\
+\texttt{gold/exports/hotspots.geojson} & GeoJSON & Map-ready hotspot layer \\
+\texttt{gold/exports/routes.geojson} & GeoJSON & Map-ready route comparison layer \\
+\texttt{powerbi\_inputs/Narendra.pbit} & Power BI & Desktop dashboard template \\ \bottomrule
+\end{tabular}
+\end{table}
+
+The parquet outputs use columnar storage with snappy compression, reducing storage requirements while maintaining query performance. Partitioning by year and month enables efficient temporal filtering during re-runs or incremental updates. The CSV exports are designed for broad compatibility with visualization tools, statistical software, and spreadsheet applications. GeoJSON files follow the RFC 7946 specification and include properties for styling and filtering in web mapping libraries.
+
+Model artifacts are persisted using Spark ML's native serialization format, preserving the complete pipeline including preprocessing transformers and trained estimators. This ensures that predictions can be reproduced exactly without retraining. The walkforward metrics CSV provides a transparent record of model performance across temporal folds, supporting evaluation and comparison of different modeling approaches.
+
+The system design demonstrates how a set of loosely coupled components can deliver a cohesive analytics product. By separating ingestion, processing, modeling, and visualization, each component can evolve independently. This is important in applied settings where data sources change and new requirements emerge. The choice to expose configuration through parameters rather than code changes supports experimentation and reduces operational risk. The design therefore embodies principles of maintainability and extensibility, which are central to modern data engineering practice.
+
+The implementation also reveals practical considerations such as file path management, container mounts, and export conventions. These details, while often overlooked in academic work, determine whether a system can be executed reliably. By documenting these conventions and embedding them into scripts and orchestration, the project ensures that the pipeline is not only conceptually sound but also executable in a real environment. This emphasis on implementation detail strengthens the technical contribution of the dissertation.
+
+A further design consideration is the handling of outputs for multiple audiences. Analytical outputs must be suitable for technical inspection, while dashboard outputs must be lightweight and interpretable. The pipeline therefore produces both detailed parquet files and simplified CSV or GeoJSON extracts. This dual output strategy supports data scientists and decision makers simultaneously. It also ensures that the system can be extended with additional visualization or reporting tools without reprocessing the full dataset.
+
+Another implementation detail is the management of configuration and secrets. The system separates configuration values such as file paths and region identifiers from code, allowing updates without code changes. API keys for data access are handled through environment variables, which aligns with security best practice. These choices reduce operational risk and make the pipeline easier to deploy in different environments. They also simplify collaboration because configuration changes do not require modifications to core scripts.
+
+The design also anticipates maintenance tasks such as cleaning temporary files and managing storage growth. By storing large intermediate artifacts in structured locations, it becomes easier to archive or remove outdated outputs without affecting current runs. This operational consideration supports long term use and aligns with the data governance expectations of applied analytics systems.
+Figure~\ref{fig:architecture} summarizes the system architecture and how data moves from ingestion to the dashboard.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=0.9cm and 0.9cm]
+  \node[block] (sources) {DfT + TfL\\sources};
+  \node[block, right=of sources] (bronze) {Bronze\\raw};
+  \node[block, right=of bronze] (silver) {Silver\\cleaned};
+  \node[block, right=of silver] (gold) {Gold\\features + outputs};
+  \node[block, right=of gold] (dashboard) {Mapbox\\dashboard};
+  \node[smallblock, above=of silver] (airflow) {Airflow\\orchestration};
+  \node[smallblock, below=of silver] (spark) {Spark\\processing};
+  \draw[line] (sources) -- (bronze);
+  \draw[line] (bronze) -- (silver);
+  \draw[line] (silver) -- (gold);
+  \draw[line] (gold) -- (dashboard);
+  \draw[line] (airflow) -- (silver);
+  \draw[line] (airflow) -- (gold);
+  \draw[line] (spark) -- (silver);
+  \draw[line] (spark) -- (gold);
+\end{tikzpicture}
+\caption{System architecture including data lake, orchestration, and dashboard.}
+\label{fig:architecture}
+\end{figure}
+
+\begin{lstlisting}[language=Python,caption={Airflow task configuration pattern.}]
+step02_build_gold_features = runner_task(
+    task_id="step02_build_gold_features",
+    command=[
+        "/opt/user_scripts/02_build_gold_features_spark.py",
+        "--in_parquet", "/data_lake/silver/cleaned_parquet/region=London",
+        "--out_gold", "/data_lake/gold/features_hourly",
+        "--region", "London"
+    ],
+)
+\end{lstlisting}

@@ -1,0 +1,93 @@
+\chapter{Introduction}
+\section{Urban congestion context}
+Urban traffic congestion is a persistent systems problem shaped by rapid urbanization, constrained road space, and complex travel demand. In large cities such as London, congestion affects travel time reliability, air quality, and the economic efficiency of freight and commuter mobility. The public sector and private operators face operational and strategic challenges that require data driven planning. Traditional traffic management relies on historical averages and manual reporting, which are insufficient for modern network complexity. The growing availability of open transport datasets creates an opportunity to move from descriptive reporting to predictive analytics. Forecasting congestion at an hourly resolution enables proactive interventions, targeted infrastructure investment, and scenario evaluation. The London road network provides a rich case study because it combines dense traffic, diverse road categories, and active policy initiatives focused on congestion reduction. The technical challenge lies not only in building a predictive model but in creating a repeatable data pipeline that can process large datasets, reconcile inconsistent inputs, and deliver outputs in a form that is accessible to decision makers.
+
+Congestion is a multi dimensional phenomenon involving volume, speed, and variability. In the absence of direct travel time data, traffic volume serves as a robust proxy that correlates with delay on urban roads. This proxy allows the use of long term count datasets and supports large scale modeling. The complexity of traffic dynamics in London highlights the need for temporal features that capture periodic patterns, as well as external indicators such as disruptions that alter normal flow. The project therefore frames congestion prediction as a structured regression task with clearly defined inputs and outputs. The broader objective is to demonstrate that predictive analytics can be operationalized within a disciplined data engineering architecture, rather than remaining as isolated experiments. This framing aligns with the expectations of an MSc Big Data Analytics project where both analytical rigor and system design are assessed.
+
+A further consideration is the policy context in which congestion analytics are used. Decisions on road pricing, signal timing, and maintenance schedules increasingly rely on evidence derived from data. A pipeline that provides consistent outputs enables comparisons across time and supports monitoring of policy interventions. The emphasis on hourly forecasting reflects the cadence of operational decision making, where short term predictions are more actionable than monthly aggregates. This context motivates a system that is both technically robust and operationally interpretable, ensuring that analytical outputs can be integrated into planning workflows.
+
+\section{Motivation and practical drivers}
+The motivation is both technical and applied. Technically, the project demonstrates an end to end data pipeline that integrates heterogeneous sources, handles large volumes of records, and produces machine learning outputs suitable for spatial analysis. Practically, the outcomes support two operational decisions: where congestion hotspots occur and how routing strategies can avoid them. Public sector agencies require evidence based insights rather than static dashboards. A reproducible pipeline reduces the cost of updates, supports auditability, and makes it possible to extend the system to new regions or alternative targets. The use of Apache Spark and Airflow reflects industry practice for reliable orchestration and scalable processing. A web based Mapbox dashboard translates analytical outputs into an interpretable geospatial product for users who are not data engineers. The combination of predictive modeling and routing analysis provides a coherent narrative from data ingestion to actionable insight.
+
+The project also addresses a common gap in applied data science work: the transition from model outputs to operational decision support. Many academic studies report accuracy metrics without demonstrating how the predictions inform spatial planning or routing choices. In this work, predicted congestion is converted to hotspot rates at the road segment level and then used to weight a routing graph. This transformation provides a concrete example of how model outputs can be embedded into a downstream task. Another motivation is transparency. Open datasets and reproducible code allow the pipeline to be audited, which is particularly important in public policy contexts where transparency is essential. The project therefore emphasizes both the analytical pipeline and the governance of data processing.
+
+A practical driver is the need to balance scalability with local execution. Many public sector projects operate with limited infrastructure and require solutions that can run on commodity hardware. The pipeline is designed to run in a local environment while adopting scalable patterns such as partitioned storage and containerized tasks. This provides a bridge between prototype and production and demonstrates how big data tooling can be used effectively in resource constrained settings.
+
+\section{Research aim and objectives}
+The aim of this dissertation is to design, implement, and evaluate a scalable pipeline for predicting urban traffic congestion and visualizing congestion aware routing outputs. The objectives are: (1) acquire and harmonize London traffic count data with disruption data, (2) engineer temporal and spatial features suitable for supervised learning, (3) train and evaluate forecasting models under walk forward validation, (4) generate spatial outputs that quantify hotspot risk by road segment, (5) implement a routing post processing stage that compares shortest distance and congestion aware routes, and (6) deliver a web based dashboard that communicates predictions and route comparisons. These objectives guide the chapter structure and the evaluation framework used throughout the report.
+
+The contributions of this dissertation are:
+\begin{itemize}[leftmargin=*]
+  \item Reproducible pipeline (Airflow $\rightarrow$ Spark $\rightarrow$ curated datasets).
+  \item Walk forward evaluation for robust temporal validation.
+  \item Hotspot forecasting and spatial analytics for congestion risk.
+  \item Dashboard for decision support with maps and route suggestions.
+\end{itemize}
+
+Each objective corresponds to a distinct technical deliverable. Data acquisition involves automated download and structured storage. Feature engineering requires conversion of raw timestamps and categorical data into numeric variables. Model training and evaluation involve configuring Spark ML pipelines and selecting metrics appropriate for time series forecasting. Spatial outputs require a transformation from tabular predictions to GeoJSON, which requires a routing graph and coordinate mapping. The dashboard integrates these outputs into an interactive map that supports filtering and comparison. The objectives are designed to ensure that the final outcome is not only a predictive model but also a complete analytics system that can be executed end to end.
+
+The objectives also provide clear checkpoints for validation. Data integration can be validated by inspecting cleaned parquet outputs. Feature engineering can be validated through schema checks and summary statistics. Model training is validated using evaluation metrics and visual inspection of residuals. Spatial outputs are validated through map overlays and route statistics. These checkpoints ensure that progress can be measured objectively throughout the project.
+
+\section{Research questions}
+Four research questions structure the work. RQ1 (Forecasting): How accurately can congestion hotspots in London be forecast using TfL flow and incident data and DfT historical volume data? RQ2 (Patterns): What spatio-temporal patterns characterise congestion in London, including peak versus off-peak periods, weekday versus weekend differences, seasonality, and spatial clustering? RQ3 (Model comparison): Which modelling approach is most reliable under walk-forward validation, comparing baselines, tree-based methods, and sequence or time-series models, and why? RQ4 (Decision support): How effectively can predicted congestion risk be communicated via an interactive dashboard with maps, hotspot risk, and route suggestions to support user decisions? These questions ensure that the dissertation addresses data integration, predictive performance, spatial interpretation, and practical delivery.
+
+The first question emphasizes data fusion and predictive accuracy using the specific TfL and DfT sources. The second question focuses on temporal and spatial structure that shapes congestion dynamics. The third question evaluates model reliability under realistic validation, linking algorithm choice to operational robustness. The fourth question connects analytics to communication and usability, which is essential for applied decision support.
+
+Each question aligns with a set of deliverables and evaluation criteria. For example, RQ1 is addressed by documenting data ingestion and forecasting accuracy for hotspot rates. RQ2 is addressed by reporting temporal profiles and spatial clustering patterns. RQ3 is addressed by comparative walk-forward metrics and a rationale for the selected model class. RQ4 is addressed by demonstrating dashboard outputs, hotspot maps, and route suggestions. This mapping keeps the report focused and ensures conclusions are grounded in evidence.
+
+\begin{table}[H]
+\centering
+\caption{RQ to evidence map.}
+\begin{tabular}{p{0.10\linewidth} p{0.22\linewidth} p{0.20\linewidth} p{0.22\linewidth} p{0.20\linewidth}}
+\toprule
+RQ & Dataset(s) & Method & Output artefacts (figure/table IDs) & Where answered (chapter/section) \\
+\midrule
+RQ1 & TfL flow and incidents; DfT traffic counts & Data integration, feature engineering, hotspot forecasting & Fig.~\ref{fig:pipeline-concept}, Tab.~\ref{tab:dictionary} & Ch.3 Data and Methodology; Ch.4 Methodology \\
+RQ2 & TfL flow; DfT counts; spatial network & Temporal profiling, spatial clustering & Fig.~\ref{fig:heatmap}, Fig.~\ref{fig:seasonal}, Fig.~\ref{fig:hotspot-map} & Ch.6 Results and Evaluation \\
+RQ3 & Engineered features; walk-forward folds & Baselines vs tree models vs sequence & Tab.~\ref{tab:model-compare}, Fig.~\ref{fig:error-peak} & Ch.6 Results and Evaluation \\
+RQ4 & GeoJSON routes and hotspots; metrics CSV & Mapbox dashboard, route comparison & Fig.~\ref{fig:dash-views}, Fig.~\ref{fig:architecture} & Ch.5 System Design; Ch.6 Results \\
+\bottomrule
+\end{tabular}
+\label{tab:rq-evidence}
+\end{table}
+
+\section{Scope and constraints}
+The scope is limited to road traffic congestion in London and focuses on hourly aggregation. The problem is framed as a regression task predicting traffic volume as a proxy for congestion. The project does not incorporate live sensor feeds or microsimulation. The analysis emphasizes reproducibility and scalability rather than real time streaming. Constraints include data quality issues in open datasets, missing coordinates for certain count points, and the need to operate within local compute limits while still demonstrating big data engineering patterns. The Mapbox dashboard is designed as a static front end reading generated GeoJSON and CSV outputs rather than as a fully dynamic application. These constraints reflect typical MSc project boundaries while still enabling a technically complete pipeline.
+
+Another constraint is the availability of labeled data for advanced targets such as travel time or congestion indices. While these targets could improve interpretability, they are not consistently available in public datasets at scale. The project therefore focuses on a robust proxy and ensures that the methodology can be applied with available data. The decision to operate in local Spark mode reflects practical limits on compute resources but still demonstrates scalability patterns through data partitioning and pipeline design. The constraints are explicitly acknowledged to set realistic expectations for deployment and to guide the interpretation of results.
+
+The constraints also influence the choice of evaluation and visualization methods. The absence of direct speed data means that validation relies on internal consistency and plausibility rather than external ground truth. The use of static dashboards reflects a requirement for low cost hosting and minimal operational overhead. These choices are consistent with the overall goal of building a practical and reproducible system within MSc project boundaries.
+
+\section{Dissertation structure}
+The dissertation is organized into seven chapters. Chapter 2 reviews prior work on traffic forecasting, spatiotemporal modeling, and geospatial decision support. Chapter 3 describes the datasets, data quality issues, and the problem formulation. Chapter 4 presents the methodological approach, including feature engineering and validation. Chapter 5 details system architecture, data lake design, and orchestration. Chapter 6 reports experimental results, evaluation metrics, and routing outcomes. Chapter 7 concludes with a summary of contributions and future directions. An appendix provides supporting details and configuration notes.
+
+This structure ensures a clear progression from contextual background to technical implementation and evaluation. The early chapters establish the rationale and define the analytical problem. The middle chapters detail the methodological and architectural decisions. The final chapters evaluate the system and reflect on limitations and future improvements. The appendix provides supplementary material without interrupting the main narrative, keeping the report focused and aligned with MSc dissertation standards.
+
+The structure also supports the research questions by dedicating chapters to the data pipeline, modeling approach, and spatial outputs. This ensures that each question is addressed in an appropriate context and that the narrative remains coherent. The reader is guided from motivation to implementation and finally to evaluation, enabling a comprehensive understanding of the work.
+
+The introduction also establishes a commitment to technical reproducibility. The project is structured so that each stage can be rerun with updated data, and outputs are preserved in a consistent format. This is important in the context of open data, where updates and corrections are common. The report therefore emphasizes not only analytical outcomes but also the engineering practices required to maintain those outcomes over time. This framing reinforces the role of data pipelines as long term assets rather than one off experiments, which is a central theme of big data analytics practice.
+
+Another introductory consideration is the relationship between prediction and policy. Traffic analytics can influence decisions on congestion charging, infrastructure investment, and service planning. The credibility of such decisions depends on the transparency of the analytical process and on a clear understanding of uncertainties. The project therefore adopts a conservative modeling approach and focuses on stable outputs rather than aggressive optimization. This supports interpretability and reduces the risk of overfitting to short term fluctuations. The emphasis on transparent engineering and evaluation ensures that outputs can be scrutinized and trusted by stakeholders, which is essential for responsible deployment.
+
+This framing helps align technical choices with public accountability and provides a consistent lens for interpreting results throughout the report.
+The narrative remains consistent across chapters and sections.
+Figure~\ref{fig:pipeline-concept} summarizes the end to end system flow from data sources to dashboard outputs and anchors the scope of the dissertation.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=1.0cm and 0.6cm]
+  \node[block] (sources) {Open\\data sources};
+  \node[block, below=of sources] (ingest) {Ingestion\\and storage};
+  \node[block, below=of ingest] (clean) {Cleaning\\and features};
+  \node[block, below=of clean] (model) {Modeling\\and validation};
+  \node[block, below=of model] (spatial) {Spatial\\post processing};
+  \node[block, below=of spatial] (dash) {Dashboard\\and reporting};
+  \draw[line] (sources) -- (ingest);
+  \draw[line] (ingest) -- (clean);
+  \draw[line] (clean) -- (model);
+  \draw[line] (model) -- (spatial);
+  \draw[line] (spatial) -- (dash);
+\end{tikzpicture}
+\caption{End-to-end system overview.}
+\label{fig:pipeline-concept}
+\end{figure}

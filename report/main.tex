@@ -1,0 +1,144 @@
+% Main dissertation file
+\documentclass[12pt,a4paper,oneside]{report}
+
+% ---- Packages ----
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{siunitx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+\pgfplotsset{compat=1.18}
+
+% ---- Page setup ----
+\geometry{margin=1in}
+\onehalfspacing
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  urlcolor=blue,
+  citecolor=black
+}
+
+% ---- Code style ----
+\lstdefinestyle{codestyle}{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  backgroundcolor=\color{gray!5},
+  keywordstyle=\color{blue!60!black},
+  commentstyle=\color{green!50!black},
+  stringstyle=\color{orange!60!black}
+}
+\lstset{style=codestyle}
+
+% ---- Diagram styles ----
+\tikzset{
+  block/.style={rectangle, draw, rounded corners, align=center, minimum width=2.7cm, minimum height=0.9cm},
+  smallblock/.style={rectangle, draw, rounded corners, align=center, minimum width=2.3cm, minimum height=0.8cm},
+  line/.style={-Latex, thick}
+}
+
+% ---- Title info ----
+% ---- Heading sizes ----
+% Title: 16pt, Section: 14pt, Subsection: 13.8pt, Subsubsection: 13.6pt
+\titleformat{\chapter}
+  {\normalfont\fontsize{16pt}{20pt}\bfseries}
+  {\thechapter}{1em}{}
+\titleformat{\section}
+  {\normalfont\fontsize{14pt}{18pt}\bfseries}
+  {\thesection}{1em}{}
+\titleformat{\subsection}
+  {\normalfont\fontsize{13.8pt}{17pt}\bfseries}
+  {\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+  {\normalfont\fontsize{13.6pt}{17pt}\bfseries}
+  {\thesubsubsection}{1em}{}
+
+% ---- Title info ----
+\title{Predictive Analytics for Traffic Congestion in Urban Areas: A London Case Study}
+\author{Narendra Chitirala}
+\date{MSc Big Data Analytics}
+
+\begin{document}
+
+% ---- Front matter ----
+\begin{titlepage}
+  \centering
+  {\fontsize{16pt}{20pt}\selectfont \textbf{Predictive Analytics for Traffic Congestion in Urban Areas: A London Case Study} \par}
+  \vspace{1cm}
+  {\large MSc Big Data Analytics \par}
+  \vspace{1cm}
+  {\large Author: Narendra Chitirala \par}
+  \vspace{0.5cm}
+  {\large Institution: Sheffield Hallam University \par}
+  \vspace{0.5cm}
+  {\large Submission Date: Jan 2026 \par}
+  \vfill
+  {\large Supervisor: Gregor Milligan \par}
+\end{titlepage}
+
+\pagenumbering{roman}
+
+\chapter*{Abstract}
+Outputs are visualized through dual dashboards: a web-based Mapbox interface hosted on GitHub Pages at \url{https://narendrachit.github.io/Traffic_prediction/} and a desktop Power BI dashboard.
+
+\chapter*{Acknowledgements}
+The author expresses sincere gratitude to Gregor Milligan for consistent guidance, constructive critique, and encouragement throughout the dissertation process. Appreciation is extended to academic staff in the MSc Big Data Analytics programme for the rigorous curriculum that underpinned the methodological and technical components of this work. Thanks are also offered to peers and colleagues who reviewed drafts, tested the pipeline, and shared practical advice on data engineering workflows. The support of family and friends is acknowledged for patience, motivation, and understanding during intensive stages of implementation and writing. Access to open data from the Department for Transport and Transport for London is gratefully recognized, as these sources made the empirical study possible. The project benefited from the open source community behind Apache Spark, Airflow, Mapbox, and related libraries, whose documentation and tooling enabled rapid development and reproducibility. Gratitude is also extended to classmates who shared seminar feedback and to the university ethics process that provided a clear framework for responsible data use. Institutional facilities, including computing resources and library access, provided an enabling environment for experimentation, literature review, and formal writing, and these contributions are acknowledged with gratitude. Administrative support during submission preparation is also appreciated for ensuring deadlines, formatting checks, and procedural requirements were met.
+
+\tableofcontents
+\listoffigures
+\listoftables
+
+\clearpage
+\pagenumbering{arabic}
+
+% ---- Chapters ----
+\include{chapters/01_introduction}
+\include{chapters/02_literature_review}
+\include{chapters/03_data_and_problem}
+\include{chapters/04_methodology}
+\include{chapters/05_system_design}
+\include{chapters/06_results_evaluation}
+\include{chapters/07_conclusion}
+
+% ---- Ethics and Data Governance ----
+\chapter*{Ethics and Data Governance}
+Ethical scrutiny and approval. This project was reviewed using Sheffield Hallam University's low-risk ethics process (UREC2). The study does not recruit human participants and does not involve NHS premises, vulnerable groups, invasive procedures, or collection of personally identifiable information. 
+
+Data sources and legal basis. All inputs are derived from publicly available transport datasets, primarily the Transport for London (TfL) Open Data API and the UK Department for Transport traffic count dataset. These datasets are used under the terms stated in the project documentation (Open Government Licence) and are cited appropriately in the dissertation and technical documentation. 
+
+Privacy and confidentiality. The pipeline processes traffic flow, counts, and incident metadata at aggregate or network level. No personal data is intentionally collected, stored, or reported, and no outputs are designed to identify individuals. 
+
+Data storage, security, and retention. Working datasets and outputs are stored on Sheffield Hallam University's networked F drive. Backups are maintained on AWS S3 with restricted access. Data are deleted or archived after project completion in line with SHU data management guidance. 
+
+Risk assessment. As the work is conducted using secondary public datasets with no in-person fieldwork, risks to participants are not applicable. Researcher risk is minimal and is managed through standard safe working practices for computer-based work.
+
+% ---- References ----
+\bibliographystyle{apalike}
+\bibliography{references}
+
+% ---- Appendices ----
+\appendix
+\include{chapters/appendix_a}
+
+\end{document}
