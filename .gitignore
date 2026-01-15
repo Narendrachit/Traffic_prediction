@@ -16,6 +16,11 @@ airflow/mapbox_dashboard/data/*
 !airflow/mapbox_dashboard/data/hotspots.geojson
 !airflow/mapbox_dashboard/data/routes.geojson
 !airflow/mapbox_dashboard/data/walkforward_metrics.csv
+docs/data/*
+!docs/data/
+!docs/data/hotspots.geojson
+!docs/data/routes.geojson
+!docs/data/walkforward_metrics.csv
 airflow/dags/data/
 airflow/dags/data_lake/
 airflow/dags/scripts/*.msi
