@@ -9,7 +9,12 @@ Thumbs.db
 data/
 outputs/
 spark_tmp/
-airflow/mapbox_dashboard/data/
+airflow/mapbox_dashboard/data/*
+!airflow/mapbox_dashboard/data/
+!airflow/mapbox_dashboard/data/.gitkeep
+!airflow/mapbox_dashboard/data/hotspots.geojson
+!airflow/mapbox_dashboard/data/routes.geojson
+!airflow/mapbox_dashboard/data/walkforward_metrics.csv
 airflow/dags/data/
 airflow/dags/data_lake/
 airflow/dags/scripts/*.msi
