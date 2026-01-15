@@ -1,0 +1,35 @@
+{
+  "region": "London",
+  "graph_pkl": "data_lake\\gold\\routing_graph_weighted\\region=London\\routing_graph_weighted.pkl",
+  "from_input": "A407",
+  "to_input": "Bugsby's Way",
+  "from_node": "A407",
+  "to_node": "Bugsby's Way",
+  "run_utc": "20260101T144612Z",
+  "hotspot_threshold": 0.0,
+  "shortest_distance": {
+    "edges": 6,
+    "total_length_km": 10.9,
+    "total_weight_km": 12.465217391304348,
+    "hotspot_edges": 1,
+    "hotspot_edge_share": 0.16666666666666666,
+    "avg_hotspot_rate": 0.08695652173913043,
+    "max_hotspot_rate": 0.5217391304347826
+  },
+  "avoid_hotspots": {
+    "edges": 6,
+    "total_length_km": 11.165217391304347,
+    "total_weight_km": 11.165217391304347,
+    "hotspot_edges": 0,
+    "hotspot_edge_share": 0.0,
+    "avg_hotspot_rate": 0.0,
+    "max_hotspot_rate": 0.0
+  },
+  "comparison": {
+    "same_path": false,
+    "extra_distance_km_for_avoid": 0.26521739130434696,
+    "hotspot_edges_reduction": 1,
+    "hotspot_edge_share_reduction": 0.16666666666666666,
+    "avg_hotspot_rate_reduction": 0.08695652173913043
+  }
+}

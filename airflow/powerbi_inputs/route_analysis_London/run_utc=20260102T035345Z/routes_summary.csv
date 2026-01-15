@@ -1,0 +1,7 @@
+from_node,to_node,len_total_km,avoid_total_km,len_weight_km,avoid_weight_km,extra_distance_km,hot_edges_len,hot_edges_avoid,avg_hot_len,avg_hot_avoid,same_path
+A407,A4088 Neasden Lane North,1.889,1.889,1.889,1.889,0.0,0,0,0.0,0.0,True
+A407,A41(T),1.253,1.253,1.253,1.253,0.0,0,0,0.0,0.0,True
+A407,Adelaide Rd roundabout,2.94,2.94,2.94,2.94,0.0,0,0,0.0,0.0,True
+A407,Adelaide Road roundabout,2.94,2.94,2.94,2.94,0.0,0,0,0.0,0.0,True
+A407,Herbert Rd,3.441,3.441,3.441,3.441,0.0,0,0,0.0,0.0,True
+A407,M1 roundabout,1.168,1.168,1.168,1.168,0.0,0,0,0.0,0.0,True

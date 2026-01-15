@@ -1,0 +1,12 @@
+{
+  "step": "07_route_demo",
+  "region": "London",
+  "graph_pkl": "data_lake\\gold\\routing_graph_weighted\\region=London\\routing_graph_weighted.pkl",
+  "from_node": "A407",
+  "mode": "single_to_node",
+  "to_node": "Bugsby's Way",
+  "hotspot_threshold": 0.0,
+  "created_utc": "2026-01-02T14:57:43Z",
+  "destinations_requested": 1,
+  "destinations_completed": 1
+}

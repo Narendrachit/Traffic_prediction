@@ -1,0 +1,7 @@
+Avoid-route changed to bypass risky edges on the shortest-distance route:
+- Removed: A41 -> LA Boundary | hotspot_rate=0.5217 | penalty_km=1.5652
+
+Replacement edges used by avoid-route (typically lower risk):
+- Added: A407 -> A406 | hotspot_rate=0.0000 | penalty_km=0.0000
+- Added: A406 -> A504 | hotspot_rate=0.0000 | penalty_km=0.0000
+- Added: A504 -> LA Boundary | hotspot_rate=0.0000 | penalty_km=0.0000

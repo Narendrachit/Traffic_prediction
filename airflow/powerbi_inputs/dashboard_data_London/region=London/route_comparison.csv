@@ -1,0 +1,13 @@
+route,src,dst,length_km,hotspot_rate,weight_km
+shortest_distance,A407,A5,2.1,0.0,2.1
+shortest_distance,A5,A41,0.4,0.0,0.4
+shortest_distance,A41,LA Boundary,1.5,0.5217391304347826,3.065217391304348
+shortest_distance,LA Boundary,A221,2.6000000000000005,0.0,2.6000000000000005
+shortest_distance,A221,A206,3.4,0.0,3.4
+shortest_distance,A206,Bugsby's Way,0.8999999999999999,0.0,0.8999999999999999
+avoid_hotspots,A407,A406,2.1,0.0,2.1
+avoid_hotspots,A406,A504,1.3652173913043475,0.0,1.3652173913043475
+avoid_hotspots,A504,LA Boundary,0.8,0.0,0.8
+avoid_hotspots,LA Boundary,A221,2.6000000000000005,0.0,2.6000000000000005
+avoid_hotspots,A221,A206,3.4,0.0,3.4
+avoid_hotspots,A206,Bugsby's Way,0.8999999999999999,0.0,0.8999999999999999

@@ -1,0 +1,12 @@
+{
+  "step": "07_route_demo",
+  "region": "London",
+  "graph_pkl": "data_lake\\gold\\routing_graph_weighted\\region=London\\routing_graph_weighted.pkl",
+  "from_node": "A407",
+  "mode": "all_to_nodes",
+  "to_node": null,
+  "hotspot_threshold": 0.0,
+  "created_utc": "2026-01-02T14:57:56Z",
+  "destinations_requested": 658,
+  "destinations_completed": 274
+}

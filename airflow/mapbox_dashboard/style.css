@@ -1,0 +1,40 @@
+:root{
+  --bg:#0b1020;
+  --panel:#101a33;
+  --muted:#9fb0d0;
+  --text:#e9efff;
+  --accent:#4fd1c5;
+  --border:rgba(255,255,255,.08);
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+body{background:var(--bg);color:var(--text)}
+a{color:var(--accent);text-decoration:none}
+.app{display:grid;grid-template-columns:360px 1fr;height:100vh}
+.panel{border-right:1px solid var(--border);background:linear-gradient(180deg,var(--panel),rgba(16,26,51,.6));padding:16px;overflow:auto}
+.h1{font-size:18px;font-weight:700;margin:0 0 6px}
+.sub{color:var(--muted);font-size:12px;line-height:1.35;margin:0 0 14px}
+.section{border:1px solid var(--border);border-radius:14px;padding:12px;margin:12px 0;background:rgba(255,255,255,.03)}
+.section h2{font-size:13px;margin:0 0 10px;color:#cfe1ff}
+.row{display:flex;gap:10px;align-items:center;margin:8px 0}
+.row label{font-size:12px;color:var(--muted);flex:1}
+.row input[type="range"]{width:100%}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kpi{border:1px solid var(--border);border-radius:12px;padding:10px;background:rgba(0,0,0,.12)}
+.kpi .k{font-size:11px;color:var(--muted)}
+.kpi .v{font-size:16px;font-weight:700;margin-top:4px}
+select,button,input[type="text"]{
+  width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);
+  background:rgba(0,0,0,.18);color:var(--text);outline:none;
+}
+button{cursor:pointer}
+.small{font-size:12px;color:var(--muted)}
+.table{width:100%;border-collapse:collapse;font-size:12px}
+.table th,.table td{border-bottom:1px solid var(--border);padding:6px;text-align:left}
+.badge{display:inline-block;padding:3px 8px;border-radius:999px;background:rgba(79,209,197,.15);border:1px solid rgba(79,209,197,.35);font-size:11px;color:var(--accent)}
+main{position:relative}
+#map{position:absolute;inset:0}
+.footer{margin-top:10px;color:var(--muted);font-size:11px;line-height:1.4}
+.legend{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.legend .sw{width:10px;height:10px;border-radius:2px;border:1px solid var(--border)}
+.legend span{font-size:11px;color:var(--muted)}

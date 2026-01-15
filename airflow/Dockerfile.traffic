@@ -1,0 +1,18 @@
+﻿FROM python:3.12-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    openjdk-21-jre-headless \
+    procps \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+
+COPY requirements-traffic.txt /app/requirements-traffic.txt
+RUN pip install --no-cache-dir -r /app/requirements-traffic.txt
+
+COPY dags/scripts /app/scripts
+
+ENTRYPOINT ["python"]

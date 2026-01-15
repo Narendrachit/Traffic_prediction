@@ -1,0 +1,9 @@
+Explainability — why the avoid route changed
+------------------------------------------------
+The avoid-hotspots route avoided these high-risk edges that appear in the shortest-distance route:
+  - A41 -> LA Boundary | hotspot_rate=0.5217 | penalty_km=1.5652 | len_km=1.5000
+
+Edges added in the avoid route (top changes):
+  + A407 -> A406 | hotspot_rate=0.0000 | penalty_km=0.0000 | len_km=2.1000
+  + A406 -> A504 | hotspot_rate=0.0000 | penalty_km=0.0000 | len_km=1.3652
+  + A504 -> LA Boundary | hotspot_rate=0.0000 | penalty_km=0.0000 | len_km=0.8000

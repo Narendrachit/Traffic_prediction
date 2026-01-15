@@ -1,0 +1,10 @@
+{
+  "step": "06_build_weighted_routing_graph",
+  "routing_edges_csv": ".\\data_lake\\gold\\routing_graph\\region=London\\routing_edges.csv",
+  "edge_hotspot_rate_csv": ".\\data_lake\\gold\\dashboard_data\\region=London\\edge_hotspot_rate.csv",
+  "base_graph_pkl": ".\\data_lake\\gold\\routing_graph\\region=London\\routing_graph.pkl",
+  "out_dir": "data_lake\\gold\\routing_graph_weighted\\region=London",
+  "alpha": 2.0,
+  "edges": 819,
+  "nodes": 659
+}

@@ -1,0 +1,6 @@
+Scoring window rows: 827
+Train rows: 101831
+RMSE: 193.395
+MAE : 125.676
+R2  : 0.968435
+Hotspot quantile (per hour): 0.8

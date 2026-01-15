@@ -1,0 +1,12 @@
+{
+  "region": "London",
+  "run_utc": "20260101T150204Z",
+  "graph_path": "data_lake\\gold\\routing_graph_weighted\\region=London\\routing_graph_weighted.pkl",
+  "mode": "single_pair",
+  "pairs_requested": 1,
+  "pairs_reachable": 1,
+  "hotspot_threshold": 0.0,
+  "top_k": 5,
+  "export_edges": true,
+  "export_geojson": false
+}

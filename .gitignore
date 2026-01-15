@@ -1,0 +1,19 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+Thumbs.db
+
+# Data/output artifacts
+data/
+outputs/
+spark_tmp/
+airflow/mapbox_dashboard/data/
+airflow/dags/data/
+airflow/dags/data_lake/
+airflow/dags/scripts/*.msi
+
+# Airflow runtime
+airflow/logs/
+airflow/plugins/

@@ -1,0 +1,9 @@
+{
+  "created_utc": "2026-01-02T03:53:25Z",
+  "routing_edges_csv": ".\\data_lake\\gold\\routing_graph\\region=London\\routing_edges.csv",
+  "routing_nodes_csv": ".\\data_lake\\gold\\routing_graph\\region=London\\routing_nodes.csv",
+  "edge_hotspot_rate_csv": ".\\data_lake\\gold\\dashboard_data\\region=London\\edge_hotspot_rate.csv",
+  "alpha": 2.0,
+  "nodes": 443,
+  "edges": 849
+}

@@ -1,0 +1,127 @@
+﻿from __future__ import annotations
+
+from datetime import datetime
+
+from airflow import DAG
+from airflow.utils.task_group import TaskGroup
+from airflow.providers.docker.operators.docker import DockerOperator
+# from docker.types import Mount  # only needed if you add a real volume bind
+
+DAG_ID = "traffic_congestion_london_pipeline"
+
+# If your compose project name isn't "airflow", change this:
+# docker network ls  (look for something like airflow_default)
+DOCKER_NETWORK = "airflow_default"
+
+COMMON_ENV = {
+    "PGHOST": "postgres",
+    "PGPORT": "5432",
+    "PGDATABASE": "airflow",
+    "PGUSER": "airflow",
+    "PGPASSWORD": "airflow",
+}
+
+default_args = {"owner": "narendra"}
+
+# ✅ IMPORTANT FIXES
+# 1) Do NOT create a tmpfs Mount with a Source (Docker rejects it).
+# 2) Disable Airflow's own tmp mount behavior for DockerOperator.
+DOCKER_OP_KWARGS = dict(
+    api_version="auto",
+    auto_remove=True,
+    docker_url="unix://var/run/docker.sock",
+    network_mode=DOCKER_NETWORK,
+    environment=COMMON_ENV,
+    mount_tmp_dir=False,  # ✅ prevents tmpfs mount issues
+)
+
+# Optional: if you want a persistent artifacts dir, use a VOLUME mount (not tmpfs).
+# ARTIFACTS_MOUNT = Mount(source="traffic_artifacts", target="/artifacts", type="volume")
+# And then add: mounts=[ARTIFACTS_MOUNT] to each DockerOperator.
+
+
+with DAG(
+    dag_id=DAG_ID,
+    start_date=datetime(2025, 12, 1),
+    schedule=None,
+    catchup=False,
+    default_args=default_args,
+    tags=["traffic", "london"],
+) as dag:
+
+    # -------------------------
+    # GOLD FEATURES + MODELS
+    # -------------------------
+    with TaskGroup("gold_features_and_models") as gold_features_and_models:
+        step02_build_gold_features = DockerOperator(
+            task_id="step02_build_gold_features",
+            image="traffic-runner:latest",
+            command=["/app/scripts/02_build_gold_features.py"],
+            **DOCKER_OP_KWARGS,
+            # mounts=[ARTIFACTS_MOUNT],  # optional
+        )
+
+        step03_train_models_walkforward = DockerOperator(
+            task_id="step03_train_models_walkforward",
+            image="traffic-runner:latest",
+            command=["/app/scripts/03_train_models.py"],
+            **DOCKER_OP_KWARGS,
+            # mounts=[ARTIFACTS_MOUNT],  # optional
+        )
+
+        step02_build_gold_features >> step03_train_models_walkforward
+
+    # -------------------------
+    # ROUTING GRAPH + DASHBOARD OUTPUTS
+    # -------------------------
+    with TaskGroup("routing_graph") as routing_graph:
+        step04_build_routing_graph = DockerOperator(
+            task_id="step04_build_routing_graph",
+            image="traffic-runner:latest",
+            command=["/app/scripts/04_build_routing_graph.py"],
+            **DOCKER_OP_KWARGS,
+            # mounts=[ARTIFACTS_MOUNT],  # optional
+        )
+
+        with TaskGroup("dashboard_outputs") as dashboard_outputs:
+            step05_make_dashboard_data = DockerOperator(
+                task_id="step05_make_dashboard_data",
+                image="traffic-runner:latest",
+                command=[
+                    "python",
+                    "/app/scripts/05_make_dashboard_data.py",
+                    "--hotspot_quantile",
+                    "0.60",
+                ],
+                **DOCKER_OP_KWARGS,
+                # mounts=[ARTIFACTS_MOUNT],  # optional
+            )
+
+        step04_build_routing_graph >> step05_make_dashboard_data
+
+    # -------------------------
+    # WEIGHTED ROUTING
+    # -------------------------
+    with TaskGroup("weighted_routing") as weighted_routing:
+        step06_build_weighted_routing_graph = DockerOperator(
+            task_id="step06_build_weighted_routing_graph",
+            image="traffic-runner:latest",
+            command=["/app/scripts/06_build_weighted_routing_graph.py"],
+            **DOCKER_OP_KWARGS,
+            # mounts=[ARTIFACTS_MOUNT],  # optional
+        )
+
+    # -------------------------
+    # ROUTE DEMO
+    # -------------------------
+    with TaskGroup("route_demo") as route_demo:
+        step07_route_demo = DockerOperator(
+            task_id="step07_route_demo",
+            image="traffic-runner:latest",
+            command=["/app/scripts/07_route_demo.py"],
+            **DOCKER_OP_KWARGS,
+            # mounts=[ARTIFACTS_MOUNT],  # optional
+        )
+
+    # Pipeline order
+    gold_features_and_models >> routing_graph >> weighted_routing >> route_demo

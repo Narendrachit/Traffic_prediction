@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>London Traffic Hotspots & Routing (Mapbox)</title>
+
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="panel">
+      <div class="h1">London Traffic: Hotspots & Congestion‑Aware Routing</div>
+      <p class="sub">
+        This dashboard visualises (RQ3) <span class="badge">hotspot_rate</span> per road edge and (RQ4) compares
+        distance‑only vs congestion‑aware routes derived from your model predictions.
+      </p>
+
+      <div class="section">
+        <h2>Controls</h2>
+        <div class="row">
+          <label><input id="toggleHotspots" type="checkbox" checked /> Show hotspots</label>
+        </div>
+
+        <div class="row" style="gap:12px">
+          <div style="flex:1">
+            <label class="small">Hotspot threshold: <b id="thrLabel">0.20</b></label>
+            <input id="thr" type="range" min="0" max="1" step="0.01" value="0.20" />
+            <div class="small">Tip: 0.10–0.30 gives a readable hotspot layer.</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <label class="small">Route destination (to_node)</label>
+        </div>
+        <div class="row">
+          <select id="toNodeSelect"></select>
+        </div>
+
+        <div class="row">
+          <label class="small">Route type</label>
+        </div>
+        <div class="row">
+          <select id="routeTypeSelect">
+            <option value="ALL">All</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label><input id="toggleOnlySelected" type="checkbox" checked /> Show only selected routes</label>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>KPIs</h2>
+        <div class="kpis">
+          <div class="kpi"><div class="k">Edges ≥ threshold</div><div class="v" id="kpiHotCount">–</div></div>
+          <div class="kpi"><div class="k">Max hotspot_rate</div><div class="v" id="kpiMaxHot">–</div></div>
+          <div class="kpi"><div class="k">Selected route (km)</div><div class="v" id="kpiLen">–</div></div>
+          <div class="kpi"><div class="k">Selected weighted (km‑eq)</div><div class="v" id="kpiWeight">–</div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Model performance (RQ2)</h2>
+        <div class="small" id="modelSummary">Loading metrics…</div>
+        <table class="table" id="metricsTable"></table>
+      </div>
+
+      <div class="section">
+        <h2>Legend</h2>
+        <div class="legend">
+          <div class="sw" style="background:#2dd4bf"></div><span>Low hotspot_rate</span>
+          <div class="sw" style="background:#fb7185"></div><span>High hotspot_rate</span>
+          <div class="sw" style="background:#60a5fa"></div><span>Routes</span>
+        </div>
+      </div>
+
+      <div class="footer">
+        Data sources: TfL Open Data + DfT traffic counts (public). Orchestration: Airflow. Processing: Spark. Outputs: Power BI + Mapbox.
+      </div>
+    </aside>
+
+    <main>
+      <div id="map"></div>
+    </main>
+  </div>
+
+  <script src="./config.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

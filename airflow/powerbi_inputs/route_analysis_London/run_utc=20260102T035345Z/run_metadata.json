@@ -1,0 +1,10 @@
+{
+  "region": "London",
+  "graph": "data_lake\\gold\\routing_graph_weighted\\region=London\\routing_graph_weighted.pkl",
+  "from_node_input": "A407",
+  "from_node_resolved": "A407",
+  "to_node_input": null,
+  "all_to_nodes": true,
+  "hotspot_threshold": 0.0,
+  "created_utc": "2026-01-02T03:53:45Z"
+}

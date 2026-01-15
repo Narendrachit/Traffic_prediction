@@ -1,0 +1,9 @@
+{
+  "step": "06_build_weighted_routing_graph",
+  "created_utc": "2026-01-02T14:56:26Z",
+  "alpha": 2.0,
+  "routing_edges_csv": ".\\data_lake\\gold\\routing_graph\\region=London\\routing_edges.csv",
+  "edge_hotspot_rate_csv": ".\\data_lake\\gold\\dashboard_data\\region=London\\edge_hotspot_rate.csv",
+  "edges": 819,
+  "nodes": 659
+}

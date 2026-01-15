@@ -1,0 +1,124 @@
+﻿from __future__ import annotations
+
+from datetime import datetime
+from airflow import DAG
+from airflow.utils.task_group import TaskGroup
+from airflow.providers.docker.operators.docker import DockerOperator
+from docker.types import Mount
+
+
+DAG_ID = "traffic_congestion_london_pipeline"
+
+# If your compose project name isn't "airflow", change this:
+# run in terminal: docker network ls  (look for something like airflow_default)
+DOCKER_NETWORK = "airflow_default"
+
+# Named mount not needed because we use Postgres for outputs.
+# But we still mount a temp artifacts dir inside the traffic container for intermediate files if you want.
+# If you don't need it, remove mounts entirely.
+ARTIFACTS_MOUNT = Mount(source="tmp", target="/tmp", type="tmpfs")
+
+COMMON_ENV = {
+    "PGHOST": "postgres",
+    "PGPORT": "5432",
+    "PGDATABASE": "airflow",
+    "PGUSER": "airflow",
+    "PGPASSWORD": "airflow",
+}
+
+default_args = {"owner": "narendra"}
+
+with DAG(
+    dag_id=DAG_ID,
+    start_date=datetime(2025, 12, 1),
+    schedule=None,
+    catchup=False,
+    default_args=default_args,
+    tags=["traffic", "london"],
+) as dag:
+
+    with TaskGroup("gold_features_and_models") as gold_features_and_models:
+        step02_build_gold_features = DockerOperator(
+            task_id="step02_build_gold_features",
+            image="traffic-runner:latest",
+            api_version="auto",
+            auto_remove=True,
+            command=["/app/scripts/02_build_gold_features.py"],
+            docker_url="unix://var/run/docker.sock",
+            network_mode=DOCKER_NETWORK,
+            environment=COMMON_ENV,
+            mounts=[ARTIFACTS_MOUNT],
+        )
+
+        step03_train_models_walkforward = DockerOperator(
+            task_id="step03_train_models_walkforward",
+            image="traffic-runner:latest",
+            api_version="auto",
+            auto_remove=True,
+            command=["/app/scripts/03_train_models.py"],
+            docker_url="unix://var/run/docker.sock",
+            network_mode=DOCKER_NETWORK,
+            environment=COMMON_ENV,
+            mounts=[ARTIFACTS_MOUNT],
+        )
+
+        step02_build_gold_features >> step03_train_models_walkforward
+
+    with TaskGroup("routing_graph") as routing_graph:
+        step04_build_routing_graph = DockerOperator(
+            task_id="step04_build_routing_graph",
+            image="traffic-runner:latest",
+            api_version="auto",
+            auto_remove=True,
+            command=["/app/scripts/04_build_routing_graph.py"],
+            docker_url="unix://var/run/docker.sock",
+            network_mode=DOCKER_NETWORK,
+            environment=COMMON_ENV,
+            mounts=[ARTIFACTS_MOUNT],
+        )
+        with TaskGroup("dashboard_outputs") as dashboard_outputs:
+            step05_make_dashboard_data = DockerOperator(
+                task_id="step05_make_dashboard_data",
+                image="traffic-runner:latest",
+                api_version="auto",
+                auto_remove=True,
+                command=[
+                    "python", "/app/scripts/05_make_dashboard_data.py",
+                    "--hotspot_quantile", "0.60",
+                ],
+                docker_url="unix://var/run/docker.sock",
+                network_mode=DOCKER_NETWORK,
+                environment=COMMON_ENV,
+                mounts=[ARTIFACTS_MOUNT],
+            )
+
+    step04_build_routing_graph >> step05_make_dashboard_data
+
+    with TaskGroup("weighted_routing") as weighted_routing:
+        step06_build_weighted_routing_graph = DockerOperator(
+            task_id="step06_build_weighted_routing_graph",
+            image="traffic-runner:latest",
+            api_version="auto",
+            auto_remove=True,
+            command=["/app/scripts/06_build_weighted_routing_graph.py"],
+            docker_url="unix://var/run/docker.sock",
+            network_mode=DOCKER_NETWORK,
+            environment=COMMON_ENV,
+            mounts=[ARTIFACTS_MOUNT],
+        )
+
+    with TaskGroup("route_demo") as route_demo:
+        step07_route_demo = DockerOperator(
+            task_id="step07_route_demo",
+            image="traffic-runner:latest",
+            api_version="auto",
+            auto_remove=True,
+            command=["/app/scripts/07_route_demo.py"],
+            docker_url="unix://var/run/docker.sock",
+            network_mode=DOCKER_NETWORK,
+            environment=COMMON_ENV,
+            mounts=[ARTIFACTS_MOUNT],
+        )
+
+    gold_features_and_models >> routing_graph >> weighted_routing >> route_demo
+
